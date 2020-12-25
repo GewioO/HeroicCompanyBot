@@ -8,7 +8,7 @@ def databaseConnection():
       con = psycopg2.connect(
       database = "HeroicBot",
       user     = "postgres",
-      password = "",
+      password = "D97779!",
       host     = "localhost",
       port     = "5432"
 )
@@ -24,6 +24,14 @@ def db_find_photo(level, count):
   photo = search_photo(level, count)
   databaseActions("close")
   return photo
+
+def db_delete_photo(num):
+  databaseActions("open")
+  photo, ids = search_photo_by_id(num)
+  for i in range(0,len(ids)):
+    cur.execute("DELETE from heroic where ID='"+str(ids[i])+"';")
+  databaseActions("close")
+  return photo, ids
 
 def insertNewLevel(level, path):
   cur.execute("SELECT ID, PATH, LEVEL from heroic")
@@ -45,12 +53,35 @@ def search_photo(level, count):
   cur.execute("SELECT ID, PATH, LEVEL from heroic")
   rows = cur.fetchall()
   iterator = 0
+  ids = []
   images = []
   for row in rows:
     if row[2] == str(level):
-      images.append(row[1])
-  
-  return images
+        if count == "all":
+          ids.append(row[0])
+          images.append(row[1])
+        elif iterator < 10:
+          ids.append(row[0])
+          images.append(row[1])
+          iterator += 1
+     
+  return images, ids
+
+def search_photo_by_id(num):
+  cur.execute("SELECT ID, PATH, LEVEL from heroic")
+  rows = cur.fetchall()
+  iterator = 0
+  ids = []
+  images = []
+  for row in rows:
+    if iterator < len(num):
+      if str(row[0]) == str(num[iterator]):
+        ids.append(row[0])
+        images.append(row[1])
+    else:
+      break
+    iterator += 1
+  return images, ids
 
 def databaseActions(state):
   if   state == "open":

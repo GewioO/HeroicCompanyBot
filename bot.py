@@ -45,7 +45,6 @@ def photoProcessing(message):
 
 @bot.message_handler(commands=['level'])
 def level_result(message):
-  ##bot.send_photo(message.from_user.id, photo=open('photos/file_5.jpg', 'rb'))
   level_number = message.text.replace('/level', "").strip()
   if level_number:
     count = level_number.find("all")
@@ -55,16 +54,27 @@ def level_result(message):
     else:
       level_number = digit_check(level_number)
 
-    images = postgresql.db_find_photo(level_number, count)
+    images, ids = postgresql.db_find_photo(level_number, count)
     if images:
       for i in range (0, len(images)):
+        bot.send_message(message.from_user.id, "🠗 Id for this image: " + ids[i] + " 🠗")
         bot.send_photo(message.from_user.id, photo=open(images[i], 'rb'))
-        print("image " + str(i) + " = " + str(images[i]))
     else:
       bot.send_message(message.chat.id, "You don't have any images for this level")
   else:
     bot.send_message(message.chat.id, "Something wrong")
-  print(str(message.from_user.id))
+
+@bot.message_handler(commands=['delete'])
+def delete_deck(message):
+  ids = message.text.replace('/delete', "").strip()
+  ids = ids.split()
+  for i in range(0, len(ids)):
+    if ids[i].isdigit():
+      images, nums = postgresql.db_delete_photo(ids)
+      print(images)
+      print(nums)
+    else:
+      print("GTFO")
 
 def digit_check(string):
   if string.isdigit():
