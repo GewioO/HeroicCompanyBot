@@ -10,6 +10,9 @@ You can place the bot in the telegram chat of your guild, each player will be ab
 * /level - send "/level *level_number*", bot will send you 10 photo with decks for this level. If you want get all photo for this level, use "/level *level_number* all"
 * /delete - send "/delete *id_number* or *multiple id numbers*, bot find all id and delete it.
 
+## Data base
+  * [postgeSQL](https://www.postgresql.org/download/)
+
 ## Libs
 
 * [Telebot](https://github.com/eternnoir/pyTelegramBotAPI)
