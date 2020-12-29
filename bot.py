@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import config, telebot, texts, re, urllib, os
+import config, telebot, texts, urllib, os
 from lib import directory_help, postgresql
 from telebot import types
 

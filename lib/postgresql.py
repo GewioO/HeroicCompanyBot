@@ -8,7 +8,7 @@ def databaseConnection():
       con = psycopg2.connect(
       database = "HeroicBot",
       user     = "postgres",
-      password = "D97779!",
+      password = "",
       host     = "localhost",
       port     = "5432"
 )
