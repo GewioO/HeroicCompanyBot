@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import config, telebot, texts, re, urllib
+import config, telebot, texts, re, urllib, os
 from lib import directory_help, postgresql
 from telebot import types
 
@@ -35,11 +35,11 @@ def photoProcessing(message):
           urllib.request.urlretrieve(f'https://api.telegram.org/file/bot{config.token}/{file_info.file_path}', file_info.file_path)
           result = postgresql.db_write_image(level_number,file_info.file_path)
           if result:
-            bot.send_message(message.chat.id, "Your deck is recorded")
+            bot.send_message(message.chat.id, texts.textsStorage['recorded'])
           else:
-            bot.send_message(message.chat.id, "Something wrong")
+            bot.send_message(message.chat.id, texts.textsStorage['error'])
         else:
-          bot.send_message(message.chat.id, "Something wrong")
+          bot.send_message(message.chat.id, texts.textsStorage['error'])
       
       i += 1
 
@@ -57,24 +57,29 @@ def level_result(message):
     images, ids = postgresql.db_find_photo(level_number, count)
     if images:
       for i in range (0, len(images)):
-        bot.send_message(message.from_user.id, "🠗 Id for this image: " + ids[i] + " 🠗")
+        bot.send_message(message.from_user.id, texts.textsStorage['level_id'] + ids[i])
         bot.send_photo(message.from_user.id, photo=open(images[i], 'rb'))
     else:
-      bot.send_message(message.chat.id, "You don't have any images for this level")
+      bot.send_message(message.chat.id, texts.textsStorage['absent_image'])
   else:
-    bot.send_message(message.chat.id, "Something wrong")
+    bot.send_message(message.chat.id, texts.textsStorage['error'])
 
 @bot.message_handler(commands=['delete'])
 def delete_deck(message):
   ids = message.text.replace('/delete', "").strip()
   ids = ids.split()
-  for i in range(0, len(ids)):
-    if ids[i].isdigit():
-      images, nums = postgresql.db_delete_photo(ids)
-      print(images)
-      print(nums)
-    else:
-      print("GTFO")
+  images = []
+  
+  images, delete_is_need = postgresql.db_delete_photo(ids)
+
+  for i in range(0, len(images)):
+    if postgresql.db_check_path(images[i]):
+        os.remove(images[i])
+        
+  if delete_is_need:
+    bot.send_message(message.chat.id, texts.textsStorage['delete'])
+  else:
+    bot.send_message(message.chat.id, texts.textsStorage['delete_error'])
 
 def digit_check(string):
   if string.isdigit():

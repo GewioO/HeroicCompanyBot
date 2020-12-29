@@ -31,23 +31,40 @@ def db_delete_photo(num):
   for i in range(0,len(ids)):
     cur.execute("DELETE from heroic where ID='"+str(ids[i])+"';")
   databaseActions("close")
+  if len(ids) < 1:
+    ids = False
   return photo, ids
+
+def db_check_path(path):
+  databaseActions("open")
+  photo = search_photo_by_path(path)
+  databaseActions("close")
+  return photo
+
 
 def insertNewLevel(level, path):
   cur.execute("SELECT ID, PATH, LEVEL from heroic")
-  number = 1;
+  number = [];
   rows = cur.fetchall()
   for row in rows:
-    number += 1
     if row[2] == str(level) and row[1] == path:
+      number.clear()
       number = False
       break
+    else:
+      number.append(row[0])
+  
   if number:
+    number = int(max(number))+1
     cur.execute("INSERT INTO heroic (ID, PATH, LEVEL) VALUES ("
             +str(number)+",'"+str(path)+"','"+str(level)+"')")
     return True
-  else:
+  elif number == False:
     return False
+  else:
+    cur.execute("INSERT INTO heroic (ID, PATH, LEVEL) VALUES ("
+            +str(1)+",'"+str(path)+"','"+str(level)+"')")
+    return True
 
 def search_photo(level, count):
   cur.execute("SELECT ID, PATH, LEVEL from heroic")
@@ -70,18 +87,32 @@ def search_photo(level, count):
 def search_photo_by_id(num):
   cur.execute("SELECT ID, PATH, LEVEL from heroic")
   rows = cur.fetchall()
-  iterator = 0
   ids = []
   images = []
   for row in rows:
-    if iterator < len(num):
-      if str(row[0]) == str(num[iterator]):
-        ids.append(row[0])
-        images.append(row[1])
-    else:
-      break
-    iterator += 1
+    iterator = 0
+    for i in range(0, len(num)):
+      if iterator < len(num):
+        if str(row[0]) == str(num[iterator]):
+          ids.append(row[0])
+          images.append(row[1])
+      else:
+        break
+      iterator += 1
   return images, ids
+
+def search_photo_by_path(path):
+  cur.execute("SELECT ID, PATH, LEVEL from heroic")
+  rows = cur.fetchall()
+  image = False
+  for row in rows:
+    if row[1] == path:
+      image = False
+      break
+    else:
+      image = True
+  
+  return image
 
 def databaseActions(state):
   if   state == "open":
