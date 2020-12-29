@@ -43,9 +43,8 @@ def db_check_path(path):
 
 
 def insertNewLevel(level, path):
-  cur.execute("SELECT ID, PATH, LEVEL from heroic")
+  rows = fetch_all_rows()
   number = [];
-  rows = cur.fetchall()
   for row in rows:
     if row[2] == str(level) and row[1] == path:
       number.clear()
@@ -67,8 +66,7 @@ def insertNewLevel(level, path):
     return True
 
 def search_photo(level, count):
-  cur.execute("SELECT ID, PATH, LEVEL from heroic")
-  rows = cur.fetchall()
+  rows = fetch_all_rows()
   iterator = 0
   ids = []
   images = []
@@ -85,8 +83,7 @@ def search_photo(level, count):
   return images, ids
 
 def search_photo_by_id(num):
-  cur.execute("SELECT ID, PATH, LEVEL from heroic")
-  rows = cur.fetchall()
+  rows = fetch_all_rows()
   ids = []
   images = []
   for row in rows:
@@ -102,8 +99,7 @@ def search_photo_by_id(num):
   return images, ids
 
 def search_photo_by_path(path):
-  cur.execute("SELECT ID, PATH, LEVEL from heroic")
-  rows = cur.fetchall()
+  rows = fetch_all_rows()
   image = False
   for row in rows:
     if row[1] == path:
@@ -113,6 +109,11 @@ def search_photo_by_path(path):
       image = True
   
   return image
+
+def fetch_all_rows():
+  cur.execute("SELECT ID, PATH, LEVEL from heroic")
+  rows = cur.fetchall()
+  return rows
 
 def databaseActions(state):
   if   state == "open":

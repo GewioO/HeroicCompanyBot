@@ -73,14 +73,17 @@ def delete_deck(message):
   images, delete_is_need = postgresql.db_delete_photo(ids)
 
   for i in range(0, len(images)):
-    if postgresql.db_check_path(images[i]):
+    try:
+      if postgresql.db_check_path(images[i]):
         os.remove(images[i])
-        
+    except(FileNotFoundError):
+      break
+    
   if delete_is_need:
     bot.send_message(message.chat.id, texts.textsStorage['delete'])
   else:
     bot.send_message(message.chat.id, texts.textsStorage['delete_error'])
-
+  
 def digit_check(string):
   if string.isdigit():
     return string
