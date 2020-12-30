@@ -52,11 +52,10 @@ def insertNewLevel(level, path):
       break
     else:
       number.append(row[0])
-  
   if number:
-    number = int(max(number))+1
+    new_id = len(number)+1
     cur.execute("INSERT INTO heroic (ID, PATH, LEVEL) VALUES ("
-            +str(number)+",'"+str(path)+"','"+str(level)+"')")
+            +str(new_id)+",'"+str(path)+"','"+str(level)+"')")
     return True
   elif number == False:
     return False
